@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلى سارتي وعمري كله ❤️</title>
+    <!-- استدعاء خط عربي ناعم وجميل -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- تنسيقات المظهر العام (CSS) --- */
+        body {
+            margin: 0;
+            padding: 15px;
+            background: radial-gradient(circle, #fff0f5 0%, #ffcdd2 100%);
+            font-family: 'Tajawal', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #b71c1c;
+            font-size: 1.7rem;
+            margin: 5px 0 10px 0;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9);
+        }
+
+        /* لوحة الرسم مع ظل ناعم يعطي فخامة للشجرة */
+        canvas {
+            max-width: 95vw;
+            max-height: 55vh;
+            display: none;
+            filter: drop-shadow(0px 12px 20px rgba(183, 28, 28, 0.2));
+        }
+
+        /* صندوق الرسائل الكلامية */
+        #message-box {
+            margin-top: 10px;
+            font-size: 1.3rem;
+            color: #880e4f;
+            max-width: 90%;
+            min-height: 85px;
+            font-weight: 700;
+            line-height: 1.7;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 15px 22px;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(216, 27, 96, 0.12);
+            border: 2px solid #f8bbd0;
+            display: none;
+        }
+
+        /* الأزرار التفاعلية */
+        .btn {
+            margin-top: 15px;
+            padding: 12px 32px;
+            font-size: 1.15rem;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 800;
+            background: linear-gradient(45deg, #d50000, #f50057);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(213, 0, 0, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 8px 25px rgba(213, 0, 0, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- العنوان الترحيبي -->
+    <h1 id="main-title">عندي إلك مفاجأة صغيرة يا سارتي 💌</h1>
+
+    <!-- زر البداية التفاعلي -->
+    <button id="start-btn" class="btn" onclick="startShow()">
+        افتحي هديتك يا عمري 🌸
+    </button>
+
+    <!-- لوحة رسم الشجرة -->
+    <canvas id="treeCanvas" width="520" height="470"></canvas>
+
+    <!-- صندوق عرض الكلام الحلو -->
+    <div id="message-box"></div>
+
+    <!-- زر التنقل بين الرسائل -->
+    <button id="next-btn" class="btn" onclick="nextMessage()" style="display: none;">
+        كمان كلام لعيونك ❤️
+    </button>
+
+    <script>
+        // --- كود البرمجة والرسم الاحترافي (JavaScript) ---
+
+        const canvas = document.getElementById('treeCanvas');
+        const ctx = canvas.getContext('2d');
+        const msgBox = document.getElementById('message-box');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const mainTitle = document.getElementById('main-title');
+
+        // الرسائل العامية الدافئة مع ألقاب سارة
+        const messages = [
+            "حبيبتي وسارتي الحلوة.. بعرف إنك زعلانة مني وبدك تنكدي عليا، بس والله الدنيا بدون ضحكتك ما تسوى إشي يا عمري ❤️",
+            "يا زغلولتي وروحي.. الزعل ما بيلبق لعيونك الحلوين، اضحكي وعليي الضحكة خلي قلبي يرد ينبض من جديد 🌸🥰",
+            "إنتي بنوتي وطفلتي المدللة.. لو شو ما صار بينا، بتضلي إنتي دلوعتي وأغلى حدا على قلبي بالدنيا كلها 🎀💖",
+            "لقارئتي الحلوة.. لو جمعت كل الكلام الحلو اللي بالكتب ما بوفيكي حقك، حقك عليا يا نور عيوني وما عاش اللي يزعلك 📖✨",
+            "شوفي هالشجرة كيف مليانة قلوب عشانك.. لأنك إنتي القلب كله يا سارة، يلا عاد ارضي عني وافردي هالوجه الحلو ❤️😘"
+        ];
+
+        let msgIndex = 0;
+
+        // تدرجات لونية غنية للورود (أحمر، قرمزي، وردي غامق، وردي فاتح) لإعطاء مظهر متقن
+        const petalColors = [
+            '#b71c1c', '#c62828', '#d32f2f', '#e53935',
+            '#ad1457', '#c2185b', '#d81b60', '#e91e63',
+            '#ec407a', '#f06292', '#f48fb1', '#f8bbd0', '#ff1744'
+        ];
+
+        // 1. دالة رسم وردة صغيرة على شكل قلب
+        function drawSmallHeart(x, y, size, color, rotation) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.beginPath();
+            ctx.moveTo(0, -size / 4);
+            ctx.bezierCurveTo(size / 2, -size, size * 1.25, -size / 5, 0, size * 0.85);
+            ctx.bezierCurveTo(-size * 1.25, -size / 5, -size / 2, -size, 0, -size / 4);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 2. دالة رسم الجذع والأغصان الأساسية
+        function drawTreeTrunk(startX, startY, length, angle, depth, width) {
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+
+            const endX = startX + length * Math.cos(angle);
+            const endY = startY + length * Math.sin(angle);
+
+            ctx.lineTo(endX, endY);
+            ctx.strokeStyle = '#4e342e';
+            ctx.lineWidth = width;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            if (depth > 0) {
+                setTimeout(() => {
+                    drawTreeTrunk(endX, endY, length * 0.72, angle - 0.38, depth - 1, width * 0.68);
+                    drawTreeTrunk(endX, endY, length * 0.72, angle + 0.38, depth - 1, width * 0.68);
+                }, 80);
+            }
+        }
+
+        // 3. دالة رسم خلفية قلب متصلة (لمنع أي فراغات نهائياً)
+        function drawSolidHeartBase(centerX, centerY, scale) {
+            ctx.save();
+            ctx.beginPath();
+            for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                const x = centerX + scale * (16 * Math.pow(Math.sin(t), 3));
+                const y = centerY - scale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                if (t === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            // تلوين قاعدة القلب بتدرج وردي/أحمر ناعم
+            const grad = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, scale * 16);
+            grad.addColorStop(0, '#c2185b');
+            grad.addColorStop(1, '#ff4081');
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 4. توليد نقاط متراصة جداً تغطي القلب بالكامل (شبكة + حواف) بدون أي فراغ
+        function generateDenseHeartPoints(centerX, centerY, scale) {
+            const points = [];
+
+            // أولاً: مسح شبكي متراص جداً لكل نقطة داخل القلب (خطوة كل 7 بكسل فقط)
+            for (let py = -scale * 17; py <= scale * 17; py += 7) {
+                for (let px = -scale * 18; px <= scale * 18; px += 7) {
+                    // تحويل الإحداثيات للتحقق مما إذا كانت النقطة داخل معادلة القلب الرياضية
+                    const nx = px / (scale * 16);
+                    const ny = -py / (scale * 16); // عكس المحور الصادي ليتجه القلب للأعلى
+                    
+                    // المتباينة الرياضية للقلب الممتلئ: (x^2 + y^2 - 1)^3 - x^2 * y^3 <= 0
+                    const eq = Math.pow(nx * nx + ny * ny - 1, 3) - (nx * nx * Math.pow(ny, 3));
+                    
+                    if (eq <= 0) {
+                        // إضافة إزاحة طفيفة لتبدو الورود طبيعية وغير مصفوفة كالمربعات
+                        const jitterX = (Math.random() - 0.5) * 6;
+                        const jitterY = (Math.random() - 0.5) * 6;
+                        points.push({ x: centerX + px + jitterX, y: centerY + py + jitterY + 12 });
+                    }
+                }
+            }
+
+            // ثانياً: تحديد حواف القلب بدقة عالية (350 وردة على الإطار الخارجي مباشرة) ليظهر شكل القلب حاداً ومتقناً
+            for (let i = 0; i < 350; i++) {
+                const t = (i / 350) * Math.PI * 2;
+                const x = centerX + scale * (16 * Math.pow(Math.sin(t), 3));
+                const y = centerY - scale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                points.push({ x: x, y: y });
+            }
+
+            // خلط النقاط عشوائياً لكي تتفتح الورود في كل مكان معاً بشكل مدهش
+            for (let i = points.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [points[i], points[j]] = [points[j], points[i]];
+            }
+
+            return points;
+        }
+
+        // 5. الدالة المسؤولة عن إزهار القلب الكامل بدون فراغات
+        function bloomFullHeartCanopy() {
+            const centerX = canvas.width / 2;
+            const centerY = 185;
+            const heartScale = 10.2;
+
+            // رسم أرضية القلب أولاً لضمان عدم وجود أي نقطة فارغة
+            drawSolidHeartBase(centerX, centerY, heartScale * 0.92);
+
+            // جلب جميع نقاط الورود المتراصة (حوالي 1600 وردة)
+            const flowerPoints = generateDenseHeartPoints(centerX, centerY, heartScale);
+            
+            let index = 0;
+            const batchSize = 35; // رسم 35 وردة في كل إطار حركة ليمتلئ القلب بسرعة وبسلاسة
+
+            function animateFlowers() {
+                for (let i = 0; i < batchSize && index < flowerPoints.length; i++, index++) {
+                    const pt = flowerPoints[index];
+                    const color = petalColors[Math.floor(Math.random() * petalColors.length)];
+                    const size = Math.random() * 6 + 9; // حجم كبير للوردة (بين 9 و 15) لتغطية المساحات
+                    const rotation = (Math.random() - 0.5) * 0.7;
+                    drawSmallHeart(pt.x, pt.y, size, color, rotation);
+                }
+                if (index < flowerPoints.length) {
+                    requestAnimationFrame(animateFlowers);
+                }
+            }
+            
+            animateFlowers();
+        }
+
+        // 6. دالة كتابة الكلام حرفاً بحرف
+        let typingTimer;
+        function typeText(text) {
+            clearInterval(typingTimer);
+            msgBox.innerHTML = "";
+            let i = 0;
+            nextBtn.style.display = "none";
+
+            typingTimer = setInterval(() => {
+                if (i < text.length) {
+                    msgBox.innerHTML += text.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typingTimer);
+                    nextBtn.style.display = "inline-block";
+                }
+            }, 45);
+        }
+
+        // 7. دالة بدء العرض عند الضغط على الزر
+        function startShow() {
+            startBtn.style.display = "none";
+            mainTitle.innerHTML = "إنتي نبض هالقلب يا سارتي ❤️";
+            canvas.style.display = "block";
+            msgBox.style.display = "block";
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // رسم أرضية الشجرة
+            ctx.beginPath();
+            ctx.moveTo(160, canvas.height - 12);
+            ctx.lineTo(360, canvas.height - 12);
+            ctx.strokeStyle = '#6d4c41';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // نمو الجذع
+            drawTreeTrunk(canvas.width / 2, canvas.height - 12, 90, -Math.PI / 2, 5, 18);
+
+            // بعد نصف ثانية فقط يبدأ القلب الكامل بالامتلاء بالورود
+            setTimeout(() => {
+                bloomFullHeartCanopy();
+            }, 500);
+
+            // بدء كتابة الكلام الحلو
+            setTimeout(() => {
+                typeText(messages[msgIndex]);
+            }, 900);
+        }
+
+        // 8. دالة تبديل الرسائل مع لمعان ورود جديدة فوق القلب
+        function nextMessage() {
+            msgIndex = (msgIndex + 1) % messages.length;
+            typeText(messages[msgIndex]);
+
+            const centerX = canvas.width / 2;
+            const centerY = 185;
+            const heartScale = 10.2;
+
+            // إضافة 60 وردة جديدة متلألئة فوق القلب عند كل ضغطة
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const t = Math.random() * Math.PI * 2;
+                    const r = Math.sqrt(Math.random());
+                    const x = centerX + r * heartScale * (16 * Math.pow(Math.sin(t), 3));
+                    const y = centerY - r * heartScale * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                    const color = petalColors[Math.floor(Math.random() * petalColors.length)];
+                    drawSmallHeart(x, y, Math.random() * 6 + 9, color, (Math.random() - 0.5) * 0.5);
+                }, i * 12);
+            }
+        }
+    </script>
+</body>
+</html>
